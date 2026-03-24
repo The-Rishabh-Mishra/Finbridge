@@ -1,0 +1,458 @@
+/* Credit Report Styles */
+
+.credit-report-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  padding-bottom: 60px;
+}
+
+.report-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 20px;
+}
+
+.report-header-section {
+  background: white;
+  border-radius: 12px;
+  padding: 30px;
+  margin-bottom: 30px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+}
+
+.header-content h1 {
+  font-size: 32px;
+  color: #2c3e50;
+  margin-bottom: 8px;
+}
+
+.subtitle {
+  color: #7f8c8d;
+  font-size: 16px;
+}
+
+.report-info {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  margin-bottom: 30px;
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.info-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.info-item .label {
+  color: #7f8c8d;
+  font-weight: 600;
+}
+
+.info-item .value {
+  color: #2c3e50;
+  font-weight: 700;
+}
+
+.report-card {
+  background: white;
+  border-radius: 12px;
+  padding: 30px;
+  margin-bottom: 25px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid #f0f2f5;
+}
+
+.card-header h2 {
+  margin: 0;
+  font-size: 22px;
+  color: #2c3e50;
+}
+
+.accounts-summary .summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 15px;
+}
+
+.summary-card {
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  border-left: 4px solid #3498db;
+}
+
+.summary-card.active {
+  border-left-color: #27ae60;
+  background: linear-gradient(135deg, #d5f4e6 0%, #e8f8f0 100%);
+}
+
+.summary-card.closed {
+  border-left-color: #95a5a6;
+  background: linear-gradient(135deg, #ecf0f1 0%, #f5f6f6 100%);
+}
+
+.summary-card.delinquent {
+  border-left-color: #e74c3c;
+  background: linear-gradient(135deg, #fadbd8 0%, #f9e4e1 100%);
+}
+
+.summary-label {
+  display: block;
+  font-size: 12px;
+  color: #7f8c8d;
+  text-transform: uppercase;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.summary-value {
+  display: block;
+  font-size: 28px;
+  font-weight: 700;
+  color: #2c3e50;
+}
+
+.accounts-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.account-item {
+  background: #f9f9f9;
+  border-left: 4px solid #3498db;
+  border-radius: 8px;
+  padding: 20px;
+  transition: all 0.3s ease;
+}
+
+.account-item:hover {
+  background: #f0f2f5;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.account-item.status-active {
+  border-left-color: #27ae60;
+}
+
+.account-item.status-closed {
+  border-left-color: #95a5a6;
+}
+
+.account-main {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 15px;
+}
+
+.account-info h3 {
+  margin: 0 0 5px;
+  font-size: 16px;
+  color: #2c3e50;
+}
+
+.issuer {
+  font-size: 13px;
+  color: #7f8c8d;
+  margin: 3px 0;
+}
+
+.account-number {
+  font-size: 12px;
+  color: #95a5a6;
+}
+
+.account-status {
+  display: flex;
+  gap: 10px;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.status-badge {
+  font-size: 11px;
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.status-badge.status-active {
+  background: #d5f4e6;
+  color: #27ae60;
+}
+
+.status-badge.status-closed {
+  background: #ecf0f1;
+  color: #95a5a6;
+}
+
+.payment-status {
+  font-size: 12px;
+  padding: 3px 8px;
+  border-radius: 15px;
+  font-weight: 600;
+}
+
+.payment-status.current {
+  background: #d5f4e6;
+  color: #27ae60;
+}
+
+.payment-status.overdue {
+  background: #fadbd8;
+  color: #e74c3c;
+}
+
+.account-details-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 15px;
+  padding-top: 15px;
+  border-top: 1px solid #ecf0f1;
+}
+
+.detail {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.detail-label {
+  font-size: 11px;
+  color: #95a5a6;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.detail-value {
+  font-size: 14px;
+  font-weight: 700;
+  color: #2c3e50;
+}
+
+.inquiries-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.inquiry-item {
+  background: #f9f9f9;
+  padding: 15px;
+  border-radius: 8px;
+  border-left: 4px solid;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.inquiry-item.inquiry-hard {
+  border-left-color: #e74c3c;
+}
+
+.inquiry-item.inquiry-soft {
+  border-left-color: #27ae60;
+}
+
+.inquiry-info {
+  flex: 1;
+}
+
+.inquiry-type {
+  display: inline-block;
+  font-size: 11px;
+  padding: 4px 10px;
+  border-radius: 15px;
+  background: #ecf0f1;
+  color: #2c3e50;
+  font-weight: 600;
+  margin-bottom: 5px;
+}
+
+.inquiry-lender {
+  font-size: 14px;
+  font-weight: 600;
+  color: #2c3e50;
+  margin: 3px 0;
+}
+
+.inquiry-purpose {
+  font-size: 12px;
+  color: #7f8c8d;
+}
+
+.inquiry-date {
+  font-size: 12px;
+  color: #95a5a6;
+  white-space: nowrap;
+  margin-left: 20px;
+}
+
+.important-info {
+  background: linear-gradient(135deg, #fef5e7 0%, #fde8d0 100%);
+  border-left: 4px solid #f39c12;
+  padding: 20px;
+  border-radius: 8px;
+  margin-top: 30px;
+}
+
+.important-info h3 {
+  margin: 0 0 15px;
+  color: #d68910;
+  font-size: 16px;
+}
+
+.important-info ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.important-info li {
+  padding: 8px 0;
+  color: #7d6608;
+  font-size: 13px;
+  border-bottom: 1px solid rgba(243, 156, 18, 0.2);
+  display: flex;
+  gap: 10px;
+}
+
+.important-info li:before {
+  content: '✓';
+  color: #f39c12;
+  font-weight: bold;
+  flex-shrink: 0;
+}
+
+.important-info li:last-child {
+  border-bottom: none;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .report-header-section {
+    flex-direction: column;
+  }
+
+  .report-info {
+    grid-template-columns: 1fr;
+  }
+
+  .account-main {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .account-status {
+    align-items: flex-start;
+  }
+
+  .account-details-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .report-container {
+    padding: 20px 15px;
+  }
+
+  .report-card {
+    padding: 20px;
+  }
+
+  .account-details-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .inquiry-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .inquiry-date {
+    margin-left: 0;
+    margin-top: 10px;
+  }
+}
+
+/* Report Action Buttons */
+.report-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 15px;
+  flex-wrap: wrap;
+}
+
+.report-btn {
+  padding: 10px 16px;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.report-btn.btn-primary {
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  color: white;
+}
+
+.report-btn.btn-primary:hover {
+  background: linear-gradient(135deg, #5558e3 0%, #7c3aed 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(99, 102, 241, 0.4);
+}
+
+.report-btn.btn-secondary {
+  background: #f0f4f8;
+  color: #3498db;
+  border: 1.5px solid #3498db;
+}
+
+.report-btn.btn-secondary:hover {
+  background: #e8f2fb;
+  border-color: #2980b9;
+  color: #2980b9;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(52, 152, 219, 0.2);
+}
+
+@media (max-width: 768px) {
+  .report-actions {
+    gap: 8px;
+    margin-top: 12px;
+  }
+
+  .report-btn {
+    padding: 8px 12px;
+    font-size: 12px;
+  }
+}
+
+

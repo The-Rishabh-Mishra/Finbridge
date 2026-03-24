@@ -1,0 +1,70 @@
+# Node
+node_modules/
+client/node_modules/
+server/node_modules/
+
+# Build outputs
+dist/
+build/
+client/dist/
+client/build/
+server/dist/
+
+# Vite / cache
+.vite/
+.cache/
+
+# Environment files
+.env
+.env.*
+client/.env
+server/.env
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDEs
+.vscode/
+.idea/
+
+# Coverage
+coverage/
+
+# Archives
+*.tgz
+*.zip
+
+# Misc
+*.local
+*.pem
+secret-*.key
+
+# Editor swap
+*~
+*.swp
+
+# Windows image file cache
+ehthumbs.db
+
+# JetBrains
+*.iml
+
+# macOS
+.DS_Store
+
+# Temporary
+tmp/
+
+# Ignore webpack output
+/dist/
+
+# Ignore npm pack
+*.tgz
