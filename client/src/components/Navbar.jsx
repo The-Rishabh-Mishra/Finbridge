@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
+
 
 export default function Navbar() {
   const navigate = useNavigate();
@@ -35,8 +36,9 @@ export default function Navbar() {
   return (
     <nav className="navbar">
       <div className="navbar-container">
-        <div 
-          className="navbar-logo" 
+
+        <div
+          className="navbar-logo"
           onClick={() => navigate('/dashboard')}
           style={{ cursor: 'pointer' }}
         >
@@ -46,7 +48,7 @@ export default function Navbar() {
         <ul className="nav-menu">
           {navItems.map((item, index) => (
             <li key={index}>
-              <button 
+              <button
                 className="nav-link-btn"
                 onClick={() => navigate(item.path)}
               >

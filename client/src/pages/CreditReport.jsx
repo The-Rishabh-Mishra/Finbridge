@@ -1,30 +1,42 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { AuthContext } from '../context/AuthContext';
 import InfoModal from '../components/InfoModal';
-import { generateCreditReportData } from '../utils/mockDataService.js';
+import { getUserCreditReportData, generateCreditReportData } from '../utils/mockDataService.js';
 import '../styles/credit-report.css';
 
 export default function CreditReport() {
   const [report, setReport] = useState(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const { user } = useContext(AuthContext);
 
   useEffect(() => {
     const fetchReport = async () => {
       try {
         setLoading(true);
-        await new Promise(resolve => setTimeout(resolve, 500));
-        const mockReport = generateCreditReportData();
-        setReport(mockReport);
+
+        if (user) {
+          // Get user-specific credit report data
+          const userReportData = await getUserCreditReportData(user.id || user.email);
+          setReport(userReportData);
+        } else {
+          // Fallback for anonymous users
+          const mockReport = generateCreditReportData();
+          setReport(mockReport);
+        }
       } catch (error) {
         console.error('Error fetching report:', error);
+        // Fallback to mock data on error
+        const mockReport = generateCreditReportData(user);
+        setReport(mockReport);
       } finally {
         setLoading(false);
       }
     };
 
     fetchReport();
-  }, []);
+  }, [user]);
 
   if (loading) {
     return (

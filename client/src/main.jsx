@@ -6,7 +6,7 @@ import { BrowserRouter } from 'react-router-dom'; // ✅ IMPORTANT
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <BrowserRouter>   {/* ✅ MUST WRAP APP */}
+    <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>   {/* ✅ MUST WRAP APP */}
       <App />
     </BrowserRouter>
   </React.StrictMode>

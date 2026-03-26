@@ -1,22 +1,63 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useLocation } from 'react-router-dom';
+import { AuthContext } from '../context/AuthContext';
 import InfoModal from '../components/InfoModal';
-import { generateImproveScoreData } from '../utils/mockDataService.js';
+import { getUserImproveScoreData, generateImproveScoreData } from '../utils/mockDataService.js';
 import '../styles/improve-score.css';
 
 export default function ImproveScore() {
   const location = useLocation();
-  const data = generateImproveScoreData();
+  const { user } = useContext(AuthContext);
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [expandedRec, setExpandedRec] = useState(null);
   const [activeModal, setActiveModal] = useState(null);
   const [selectedLoan] = useState(location.state?.selectedLoan || null);
+
+  useEffect(() => {
+    const fetchImproveScoreData = async () => {
+      try {
+        setLoading(true);
+
+        if (user) {
+          // Get user-specific improve score data
+          const userImproveData = await getUserImproveScoreData(user.id || user.email);
+          setData(userImproveData);
+        } else {
+          // Fallback for anonymous users
+          const mockData = generateImproveScoreData();
+          setData(mockData);
+        }
+      } catch (error) {
+        console.error('Error fetching improve score data:', error);
+        // Fallback to mock data on error
+        const mockData = generateImproveScoreData(user);
+        setData(mockData);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchImproveScoreData();
+  }, [user]);
+
+  if (loading || !data) {
+    return (
+      <div className="improve-score-page">
+        <div className="loading-container">
+          <div className="spinner"></div>
+          <p>Loading your improvement plan...</p>
+        </div>
+      </div>
+    );
+  }
 
   const scoreGap = data.targetScore - data.currentScore;
   const progressPercent = (data.currentScore / data.targetScore) * 100;
 
   return (
     <div className="improve-score-page">
-      
+
       <div className="improve-container">
         {/* Header Section */}
         <div className="improve-header">
@@ -33,7 +74,7 @@ export default function ImproveScore() {
                   <h2>Your Credit Journey</h2>
                   <p className="progress-description">Track your progress toward your credit score goal</p>
                 </div>
-                <button 
+                <button
                   className="info-btn"
                   onClick={() => setActiveModal('journey')}
                   title="How does score tracking work?"
@@ -113,7 +154,7 @@ export default function ImproveScore() {
               <h2>🤖 AI-Powered Recommendations</h2>
               <p>Personalized actions ranked by impact and priority</p>
             </div>
-            <button 
+            <button
               className="info-btn"
               onClick={() => setActiveModal('recommendations')}
               title="How are these recommendations generated?"
@@ -124,8 +165,8 @@ export default function ImproveScore() {
 
           <div className="recommendations-list">
             {data.recommendations?.map((rec, index) => (
-              <div 
-                key={rec.id} 
+              <div
+                key={rec.id}
                 className={`recommendation-item priority-${rec.priority.toLowerCase()}`}
                 onClick={() => setExpandedRec(expandedRec === rec.id ? null : rec.id)}
               >
@@ -189,7 +230,7 @@ export default function ImproveScore() {
               <h2>📊 Credit Score Factors (Impact Weighted)</h2>
               <p>Understanding what affects your credit score</p>
             </div>
-            <button 
+            <button
               className="info-btn"
               onClick={() => setActiveModal('factors')}
               title="Understand these factors"
@@ -199,35 +240,35 @@ export default function ImproveScore() {
           </div>
           <div className="factors-info">
             <div className="factor-info">
-              <div className="factor-circle" style={{backgroundColor: '#27ae60'}}>
+              <div className="factor-circle" style={{ backgroundColor: '#27ae60' }}>
                 <span>35%</span>
               </div>
               <h4>Payment History</h4>
               <p>On-time payment record is the most critical factor</p>
             </div>
             <div className="factor-info">
-              <div className="factor-circle" style={{backgroundColor: '#3498db'}}>
+              <div className="factor-circle" style={{ backgroundColor: '#3498db' }}>
                 <span>30%</span>
               </div>
               <h4>Credit Utilization</h4>
               <p>Keep usage below 30% of your available limits</p>
             </div>
             <div className="factor-info">
-              <div className="factor-circle" style={{backgroundColor: '#f39c12'}}>
+              <div className="factor-circle" style={{ backgroundColor: '#f39c12' }}>
                 <span>15%</span>
               </div>
               <h4>Credit History Length</h4>
               <p>Longer history shows stability and experience</p>
             </div>
             <div className="factor-info">
-              <div className="factor-circle" style={{backgroundColor: '#e74c3c'}}>
+              <div className="factor-circle" style={{ backgroundColor: '#e74c3c' }}>
                 <span>10%</span>
               </div>
               <h4>Credit Mix</h4>
               <p>Diverse credit types show management ability</p>
             </div>
             <div className="factor-info">
-              <div className="factor-circle" style={{backgroundColor: '#9b59b6'}}>
+              <div className="factor-circle" style={{ backgroundColor: '#9b59b6' }}>
                 <span>10%</span>
               </div>
               <h4>New Inquiries</h4>
@@ -244,7 +285,7 @@ export default function ImproveScore() {
                 <h2>🏆 Success Stories</h2>
                 <p>Real users who improved their credit scores</p>
               </div>
-              <button 
+              <button
                 className="info-btn"
                 onClick={() => setActiveModal('stories')}
                 title="Learn from success stories"
@@ -261,12 +302,12 @@ export default function ImproveScore() {
                   <div className="story-scores">
                     <div className="score-item">
                       <span className="label">From</span>
-                      <span className="score" style={{color: '#e74c3c'}}>{story.initialScore}</span>
+                      <span className="score" style={{ color: '#e74c3c' }}>{story.initialScore}</span>
                     </div>
                     <div className="score-arrow">→</div>
                     <div className="score-item">
                       <span className="label">To</span>
-                      <span className="score" style={{color: '#27ae60'}}>{story.currentScore}</span>
+                      <span className="score" style={{ color: '#27ae60' }}>{story.currentScore}</span>
                     </div>
                   </div>
                   <div className="improvement">
@@ -286,7 +327,7 @@ export default function ImproveScore() {
               <h2>📚 Educational Resources</h2>
               <p>Learn about credit management and financial growth</p>
             </div>
-            <button 
+            <button
               className="info-btn"
               onClick={() => setActiveModal('resources')}
               title="Why education matters"

@@ -6,7 +6,7 @@ import ScoreCard from '../components/ScoreCard';
 import ProfileCard from '../components/ProfileCard';
 import LoanSuggestionCard from '../components/LoanSuggestionCard';
 import InfoModal from '../components/InfoModal';
-import { generateMockDashboardData } from '../utils/mockDataService.js';
+import { generateDashboardDataFromCIBIL } from '../utils/scoreCalculationService.js';
 import '../styles/dashboard.css';
 
 export default function Dashboard() {
@@ -15,59 +15,48 @@ export default function Dashboard() {
   const [dashboardData, setDashboardData] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  const handleRecalculateScore = async () => {
+    if (!user) return;
+
+    // reset the score in dashboard state so the empty-state block shows
+    setDashboardData((prev) => {
+      if (!prev) return null;
+      return {
+        ...prev,
+        creditScore: 0,
+        scoreInsight: 'Please recalculate your score.',
+        trend: null,
+        trendPercentage: 0,
+      };
+    });
+
+    // optionally send user to CIBIL calculator to fill values again
+    navigate('/cibil-calculator');
+  };
+
   useEffect(() => {
     const fetchDashboard = async () => {
       try {
         setLoading(true);
 
-        // For demo user, use mock data
-        if (user?.isDemo) {
-          const mockData = generateMockDashboardData();
-          setDashboardData(mockData);
+        if (user) {
+          // Generate dashboard data from user's CIBIL calculations
+          const userId = user.id || user.email;
+          const dashData = generateDashboardDataFromCIBIL(userId, user);
+          setDashboardData(dashData);
         } else {
-          // For real users, fetch user data and merge with dashboard data
-          try {
-            const userResponse = await axios.get('/users/profile');
-            const userData = userResponse.data.user;
-
-            // Get mock dashboard structure and replace user data
-            const mockData = generateMockDashboardData();
-            const mergedData = {
-              ...mockData,
-              user: {
-                id: userData.id,
-                name: userData.name,
-                email: userData.email,
-                phone: userData.phone || 'Not provided',
-                createdAt: userData.createdAt,
-                isActive: userData.isActive,
-                profileCompleted: userData.profileCompleted,
-                profileCompletionPercentage: userData.profileCompletionPercentage,
-              },
-            };
-
-            setDashboardData(mergedData);
-          } catch (apiError) {
-            // If API fails, fall back to mock data with user name
-            const mockData = generateMockDashboardData();
-            mockData.user.name = user?.name || 'User';
-            mockData.user.email = user?.email || 'user@example.com';
-            setDashboardData(mockData);
-          }
+          // No user - show empty state
+          setDashboardData(null);
         }
       } catch (error) {
-        console.error('Error fetching dashboard:', error);
-        // Fall back to mock data
-        const mockData = generateMockDashboardData();
-        setDashboardData(mockData);
+        console.error('Error fetching dashboard data:', error);
+        setDashboardData(null);
       } finally {
         setLoading(false);
       }
     };
 
-    if (user) {
-      fetchDashboard();
-    }
+    fetchDashboard();
   }, [user]);
 
   if (loading) {
@@ -76,6 +65,23 @@ export default function Dashboard() {
         <div className="loading-container">
           <div className="spinner"></div>
           <p>Loading your financial profile...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!dashboardData || dashboardData.creditScore === 0) {
+    return (
+      <div className="dashboard-page">
+        <div className="dashboard-container">
+          <div className="empty-state">
+            <div className="empty-icon">📋</div>
+            <h2>No CIBIL Score Yet</h2>
+            <p>Calculate your CIBIL score to see your credit profile dashboard and get personalized recommendations.</p>
+            <button className="action-btn btn-primary" onClick={() => navigate('/cibil-calculator')}>
+              📊 Calculate CIBIL Score Now
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -111,9 +117,9 @@ export default function Dashboard() {
             <div className="stat-item">
               <span className="stat-label">Profile Completeness</span>
               <div className="progress-bar">
-                  <div className="progress-fill" style={{width: `${dashboardData?.user?.profileCompletionPercentage}%`}}></div>
-                </div>
-                <span className="stat-value">{dashboardData?.user?.profileCompletionPercentage}%</span>
+                <div className="progress-fill" style={{ width: `${dashboardData?.user?.profileCompletionPercentage}%` }}></div>
+              </div>
+              <span className="stat-value">{dashboardData?.user?.profileCompletionPercentage}%</span>
             </div>
             <InfoModal
               title="Dashboard Overview"
@@ -140,8 +146,8 @@ export default function Dashboard() {
                 <h3>Complete Your Profile</h3>
                 <p>Finish setting up your profile to unlock personalized credit insights and recommendations.</p>
               </div>
-              <button 
-                className="banner-btn" 
+              <button
+                className="banner-btn"
                 onClick={() => navigate('/complete-profile')}
               >
                 Complete Now
@@ -160,6 +166,13 @@ export default function Dashboard() {
               trend={dashboardData?.trend}
               trendPercentage={dashboardData?.trendPercentage}
             />
+            <button
+              className="action-btn btn-secondary"
+              onClick={handleRecalculateScore}
+              disabled={loading}
+            >
+               Calculate Your Score Again
+            </button>
           </div>
 
           <div className="grid-item profile-section">
@@ -188,26 +201,33 @@ export default function Dashboard() {
             />
           </div>
           <div className="credit-factors-grid">
-            {dashboardData?.creditFactors?.map((factor, index) => (
-              <div key={index} className="factor-card">
-                <div className="factor-header">
-                  <h3>{factor.name}</h3>
-                  <span className={`status-badge status-${factor.status.toLowerCase()}`}>
-                    {factor.status}
-                  </span>
-                </div>
-                <div className="factor-percentage">
-                  <div className="percentage-circle">
-                    <span className="percentage-value">{Math.round(factor.percentage)}%</span>
+            {dashboardData?.creditFactors?.map((factor, index) => {
+              const statusLabel = (factor.status || 'Unknown').toString();
+              const statusClass = statusLabel.toLowerCase().replace(/\s+/g, '-');
+              return (
+                <div key={index} className="factor-card">
+                  <div className="factor-header">
+                    <h3>{factor.label || 'N/A'}</h3>
+                    {/* <span className={`status-badge status-${statusClass}`}>
+                      {statusLabel}
+                    </span> */}
                   </div>
+                  <div className="factor-percentage">
+                    <div className="percentage-circle">
+                      <span className="percentage-value">{Math.round(factor.score ?? factor.percentage ?? 0)}%</span>
+                    </div>
+                  </div>
+                  <div className="factor-bar">
+                    <div
+                      className="factor-progress"
+                      style={{ width: `${Math.min(factor.score ?? factor.percentage ?? 0, 100)}%` }}
+                    />
+                  </div>
+                  <p className="factor-weight">Weight: {factor.weight ?? 0}%</p>
+                  <p className="factor-insight">💡 {factor.insight || 'No data available.'}</p>
                 </div>
-                <div className="factor-bar">
-                  <div className="factor-progress" style={{width: `${Math.min(factor.percentage, 100)}%`}}></div>
-                </div>
-                <p className="factor-weight">Weight: {factor.weight}%</p>
-                <p className="factor-insight">💡 {factor.insight}</p>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
 
@@ -233,29 +253,33 @@ export default function Dashboard() {
               />
             </div>
             <div className="recommendations-list">
-              {dashboardData?.aiRecommendations?.map((rec, index) => (
-                <div key={index} className={`recommendation-card priority-${rec.priority.toLowerCase()}`}>
-                  <div className="rec-header">
-                    <h3>{rec.title}</h3>
-                    <span className={`priority-badge priority-${rec.priority.toLowerCase()}`}>
-                      {rec.priority}
-                    </span>
+              {dashboardData?.aiRecommendations?.map((rec, index) => {
+                const priorityLabel = (rec.priority || 'low').toString();
+                const priorityClass = priorityLabel.toLowerCase().replace(/\s+/g, '-');
+                return (
+                  <div key={index} className={`recommendation-card priority-${priorityClass}`}>
+                    <div className="rec-header">
+                      <h3>{rec.title || 'Recommendation'}</h3>
+                      <span className={`priority-badge priority-${priorityClass}`}>
+                        {priorityLabel}
+                      </span>
+                    </div>
+                    <p className="rec-description">{rec.description}</p>
+                    <div className="rec-impact">
+                      <span className="impact-label">Estimated Impact:</span>
+                      <span className="impact-value">{rec.estimatedImpact}</span>
+                    </div>
+                    <div className="rec-actions">
+                      {rec.actions?.map((action, idx) => (
+                        <div key={idx} className="action-item">
+                          <span className="action-bullet">→</span>
+                          <span>{action}</span>
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                  <p className="rec-description">{rec.description}</p>
-                  <div className="rec-impact">
-                    <span className="impact-label">Estimated Impact:</span>
-                    <span className="impact-value">{rec.estimatedImpact}</span>
-                  </div>
-                  <div className="rec-actions">
-                    {rec.actions?.map((action, idx) => (
-                      <div key={idx} className="action-item">
-                        <span className="action-bullet">→</span>
-                        <span>{action}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         )}
@@ -268,8 +292,8 @@ export default function Dashboard() {
           </div>
           <div className="loans-grid">
             {dashboardData?.loanSuggestions?.map((loan, index) => (
-              <LoanSuggestionCard 
-                key={loan.id || index} 
+              <LoanSuggestionCard
+                key={loan.id || index}
                 loan={loan}
               />
             ))}
@@ -298,7 +322,7 @@ export default function Dashboard() {
                     <span className="assessment-score">{assessment.score}/100</span>
                   </div>
                   <div className="assessment-bar">
-                    <div className="assessment-fill" style={{width: `${assessment.score}%`}}></div>
+                    <div className="assessment-fill" style={{ width: `${assessment.score}%` }}></div>
                   </div>
                 </div>
               ))}
@@ -315,15 +339,15 @@ export default function Dashboard() {
             {dashboardData?.recentTransactions?.map((transaction, index) => (
               <div key={transaction.id || index} className="transaction-item">
                 <div className="transaction-info">
-                  <span className="transaction-type">{transaction.type}</span>
-                  <span className="transaction-desc">{transaction.description}</span>
+                  <span className="transaction-type">{transaction.type || 'Unknown'}</span>
+                  <span className="transaction-desc">{transaction.description || '-'}</span>
                 </div>
                 <div className="transaction-details">
                   <span className={`transaction-amount ${transaction.amount < 0 ? 'negative' : 'positive'}`}>
-                    {transaction.amount < 0 ? '-' : '+'} ₹{Math.abs(transaction.amount).toLocaleString()}
+                    {transaction.amount < 0 ? '-' : '+'} ₹{Math.abs(transaction.amount || 0).toLocaleString()}
                   </span>
-                  <span className={`transaction-status status-${transaction.status.toLowerCase()}`}>
-                    {transaction.status}
+                  <span className={`transaction-status status-${(transaction.status || 'unknown').toLowerCase().replace(/\s+/g, '-')}`}>
+                    {transaction.status || 'Unknown'}
                   </span>
                 </div>
               </div>
