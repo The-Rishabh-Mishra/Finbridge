@@ -23,7 +23,9 @@ html {
 }
 
 body {
-  font-family: 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  font-family:
+    "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans",
+    "Droid Sans", "Helvetica Neue", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-color: var(--light-bg);
@@ -105,6 +107,22 @@ button {
   align-items: center;
   gap: 2rem;
   flex-wrap: wrap;
+  position: relative;
+}
+
+.menu-toggle {
+  display: none;
+  background: none;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  color: var(--white);
+  font-size: 1.4rem;
+  padding: 0.5rem;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.nav-menu.active {
+  display: flex;
 }
 
 .navbar-logo {
@@ -123,7 +141,6 @@ button {
 }
 
 @keyframes pulse {
-
   0%,
   100% {
     transform: scale(1);
@@ -164,7 +181,7 @@ button {
 }
 
 .nav-menu a::after {
-  content: '';
+  content: "";
   position: absolute;
   width: 0;
   height: 2px;
@@ -198,7 +215,7 @@ button {
 }
 
 .nav-link-btn::after {
-  content: '';
+  content: "";
   position: absolute;
   width: 0;
   height: 2px;
@@ -282,7 +299,11 @@ button {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  background: linear-gradient(135deg, rgba(52, 152, 219, 0.05), rgba(46, 204, 113, 0.05));
+  background: linear-gradient(
+    135deg,
+    rgba(52, 152, 219, 0.05),
+    rgba(46, 204, 113, 0.05)
+  );
   transition: all 0.3s ease;
 }
 
@@ -368,7 +389,11 @@ button {
 }
 
 .score-insight {
-  background: linear-gradient(135deg, rgba(52, 152, 219, 0.1), rgba(46, 204, 113, 0.1));
+  background: linear-gradient(
+    135deg,
+    rgba(52, 152, 219, 0.1),
+    rgba(46, 204, 113, 0.1)
+  );
   padding: 12px;
   border-radius: 8px;
   margin: 15px 0;
@@ -407,7 +432,11 @@ button {
   width: 70px;
   height: 70px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--accent-color), var(--success-color));
+  background: linear-gradient(
+    135deg,
+    var(--accent-color),
+    var(--success-color)
+  );
   display: flex;
   align-items: center;
   justify-content: center;
@@ -557,7 +586,11 @@ button {
 
 .ai-note {
   padding: 15px 20px;
-  background: linear-gradient(135deg, rgba(52, 152, 219, 0.1), rgba(46, 204, 113, 0.1));
+  background: linear-gradient(
+    135deg,
+    rgba(52, 152, 219, 0.1),
+    rgba(46, 204, 113, 0.1)
+  );
   display: flex;
   gap: 10px;
   border-top: 1px solid rgba(52, 152, 219, 0.2);
@@ -593,9 +626,52 @@ button {
 
 /* Responsive */
 @media (max-width: 768px) {
+  .menu-toggle {
+    display: block;
+  }
+
   .nav-menu {
-    gap: 1.5rem;
-    font-size: 13px;
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    flex-direction: column;
+    align-items: start;
+    background: linear-gradient(135deg, var(--primary-color) 0%, #1a252f 100%);
+    border-top: 1px solid rgba(255, 255, 255, 0.15);
+    padding: 0.75rem 1rem 1rem;
+    gap: 0.5rem;
+    z-index: 99;
+  }
+
+  .nav-menu li {
+    width: 100%;
+  }
+
+  .nav-link-btn {
+    width: 100%;
+    text-align: left;
+    padding: 0.75rem 0.75rem;
+    border-radius: 8px;
+    font-size: 14px;
+  }
+
+  .nav-actions {
+    width: 100%;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .welcome-message {
+    font-size: 12px;
+    padding: 0.35rem 0.75rem;
+  }
+
+  .logout-btn {
+    padding: 0.45rem 1rem;
+    font-size: 12px;
   }
 
   h1 {
@@ -787,7 +863,9 @@ button {
   border-radius: 8px;
   padding: 1.5rem;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s, box-shadow 0.3s;
+  transition:
+    transform 0.3s,
+    box-shadow 0.3s;
 }
 
 .loan-suggestion-card:hover {
@@ -857,7 +935,11 @@ button {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+  background: linear-gradient(
+    135deg,
+    var(--primary-color),
+    var(--accent-color)
+  );
 }
 
 .login-container {
