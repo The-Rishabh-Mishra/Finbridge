@@ -1,30 +1,42 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { AuthContext } from '../context/AuthContext';
 import InfoModal from '../components/InfoModal';
-import { generateHistoryData } from '../utils/mockDataService.js';
+import { getUserHistoryData, generateHistoryData } from '../utils/mockDataService.js';
 import '../styles/history.css';
 
 export default function History() {
   const [history, setHistory] = useState(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const { user } = useContext(AuthContext);
 
   useEffect(() => {
     const fetchHistory = async () => {
       try {
         setLoading(true);
-        await new Promise(resolve => setTimeout(resolve, 500));
-        const mockHistory = generateHistoryData();
-        setHistory(mockHistory);
+
+        if (user) {
+          // Get user-specific history data
+          const userHistoryData = await getUserHistoryData(user.id || user.email);
+          setHistory(userHistoryData);
+        } else {
+          // Fallback for anonymous users
+          const mockHistory = generateHistoryData();
+          setHistory(mockHistory);
+        }
       } catch (error) {
         console.error('Error fetching history:', error);
+        // Fallback to mock data on error
+        const mockHistory = generateHistoryData(user);
+        setHistory(mockHistory);
       } finally {
         setLoading(false);
       }
     };
 
     fetchHistory();
-  }, []);
+  }, [user]);
 
   if (loading) {
     return (
@@ -92,7 +104,7 @@ export default function History() {
             <div className="chart-grid">
               {history?.scoreHistory?.map((entry, index) => (
                 <div key={index} className="chart-bar-wrapper">
-                  <div 
+                  <div
                     className="chart-bar"
                     style={{
                       height: `${(entry.score / 900) * 100}%`,

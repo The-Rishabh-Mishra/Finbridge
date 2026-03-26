@@ -1,0 +1,339 @@
+/* CIBIL Calculator Styles */
+.cibil-calculator-page {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+    padding: 2rem 1rem;
+}
+
+.calculator-wrapper {
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.not-authenticated {
+    text-align: center;
+    padding: 3rem 2rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    color: #e2e8f0;
+    backdrop-filter: blur(10px);
+}
+
+.not-authenticated p {
+    font-size: 1.1rem;
+    margin-bottom: 1.5rem;
+}
+
+.not-authenticated button {
+    padding: 0.75rem 1.5rem;
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.not-authenticated button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(59, 130, 246, 0.4);
+}
+
+/* Results Section */
+.results-section {
+    margin-top: 3rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    padding: 2rem;
+    backdrop-filter: blur(10px);
+    animation: slideUp 0.5s ease-out;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.results-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.results-header h2 {
+    font-size: 1.5rem;
+    color: #e2e8f0;
+    margin: 0;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    color: #64748b;
+    font-size: 2rem;
+    cursor: pointer;
+    transition: color 0.3s ease;
+    padding: 0;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.close-btn:hover {
+    color: #e2e8f0;
+}
+
+/* Score Display */
+.score-display {
+    display: flex;
+    align-items: center;
+    gap: 3rem;
+    margin-bottom: 2rem;
+    padding: 2rem;
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(34, 197, 94, 0.1));
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.score-circle {
+    flex-shrink: 0;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    background: conic-gradient(from 0deg,
+            #3b82f6 0deg,
+            #2563eb 90deg,
+            #06b6d4 180deg,
+            #10b981 270deg,
+            #3b82f6 360deg);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 20px 40px rgba(59, 130, 246, 0.3);
+}
+
+.score-number {
+    font-size: 3.5rem;
+    font-weight: 900;
+    color: white;
+    line-height: 1;
+}
+
+.score-max {
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.score-info {
+    flex: 1;
+}
+
+.score-band {
+    display: inline-block;
+    padding: 0.5rem 1.5rem;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+}
+
+.score-band.excellent {
+    background: rgba(0, 201, 167, 0.2);
+    color: #00c9a7;
+    border: 2px solid #00c9a7;
+}
+
+.score-band.very {
+    background: rgba(16, 185, 129, 0.2);
+    color: #10b981;
+    border: 2px solid #10b981;
+}
+
+.score-band.good {
+    background: rgba(59, 130, 246, 0.2);
+    color: #3b82f6;
+    border: 2px solid #3b82f6;
+}
+
+.score-band.fair {
+    background: rgba(245, 158, 11, 0.2);
+    color: #f59e0b;
+    border: 2px solid #f59e0b;
+}
+
+.score-band.poor {
+    background: rgba(239, 68, 68, 0.2);
+    color: #ef4444;
+    border: 2px solid #ef4444;
+}
+
+.score-subtext {
+    color: #cbd5e1;
+    font-size: 1rem;
+    line-height: 1.6;
+    margin: 0;
+}
+
+/* Factors Breakdown */
+.factors-breakdown {
+    margin-bottom: 2rem;
+}
+
+.factors-breakdown h3 {
+    color: #e2e8f0;
+    font-size: 1.3rem;
+    margin-bottom: 1.5rem;
+}
+
+.factors-list {
+    display: grid;
+    gap: 1.5rem;
+}
+
+.factor-item {
+    padding: 1.5rem;
+    background: rgba(15, 23, 42, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    transition: all 0.3s ease;
+}
+
+.factor-item:hover {
+    background: rgba(15, 23, 42, 0.8);
+    border-color: rgba(255, 255, 255, 0.15);
+}
+
+.factor-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.factor-label {
+    color: #e2e8f0;
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+.factor-weight {
+    color: #64748b;
+    font-size: 0.85rem;
+    background: rgba(100, 116, 139, 0.1);
+    padding: 0.25rem 0.75rem;
+    border-radius: 4px;
+}
+
+.factor-score-bar {
+    width: 100%;
+    height: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 1rem;
+}
+
+.factor-score-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.5s ease-out;
+}
+
+.factor-details {
+    margin-top: 1rem;
+}
+
+.detail-text {
+    color: #cbd5e1;
+    font-size: 0.9rem;
+    margin: 0 0 0.5rem 0;
+}
+
+.detail-tip {
+    color: #a0aec0;
+    font-size: 0.85rem;
+    margin: 0;
+    padding: 0.5rem;
+    background: rgba(255, 255, 255, 0.03);
+    border-left: 3px solid #3b82f6;
+    border-radius: 4px;
+    padding-left: 1rem;
+}
+
+/* Result Actions */
+.result-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.btn {
+    flex: 1;
+    padding: 1rem;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    color: white;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(59, 130, 246, 0.4);
+}
+
+.btn-secondary {
+    background: rgba(255, 255, 255, 0.1);
+    color: #e2e8f0;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .score-display {
+        flex-direction: column;
+        gap: 1.5rem;
+        text-align: center;
+    }
+
+    .score-circle {
+        width: 150px;
+        height: 150px;
+    }
+
+    .score-number {
+        font-size: 2.5rem;
+    }
+
+    .result-actions {
+        flex-direction: column;
+    }
+}
