@@ -122,8 +122,8 @@
 }
 
 .stat-value {
-  font-size: 24px;
-  font-weight: 700;
+  font-size: 20px;
+  font-weight: 500;
   color: #2c3e50;
 }
 
@@ -728,7 +728,6 @@
     font-size: 24px;
   }
 
-
   .profile-summary-card {
     padding: 15px;
   }
@@ -804,5 +803,3 @@
     font-size: 12px;
   }
 }
-
-

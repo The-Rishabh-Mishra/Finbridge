@@ -1,91 +1,193 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import InfoModal from '../components/InfoModal';
-import '../styles/profile.css';
+import React, { useState, useEffect, useContext } from "react";
+import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../context/AuthContext";
+import axiosInstance from "../utils/axiosInstance";
+import InfoModal from "../components/InfoModal";
+import "../styles/profile.css";
 
 export default function Profile() {
+  const { user } = useContext(AuthContext);
   const [activeModal, setActiveModal] = useState(null);
+  const [userProfile, setUserProfile] = useState(null);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-  // Mock user profile data
-  const userProfile = {
-    name: 'John Doe',
-    email: 'john.doe@email.com',
-    phone: '+1 (555) 123-4567',
-    accountCreated: 'January 15, 2023',
-    memberSince: '1 year 3 months',
-    creditScore: 745,
-    accountStatus: 'Active',
-    verificationStatus: 'Verified'
+  const formatDate = (dateString) => {
+    if (!dateString) return "N/A";
+    const date = new Date(dateString);
+    return date.toLocaleDateString(undefined, {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
   };
 
-  const personalInfo = [
-    { label: 'Email Address', value: userProfile.email, editable: true },
-    { label: 'Phone Number', value: userProfile.phone, editable: true },
-    { label: 'Account Created', value: userProfile.accountCreated, editable: false },
-    { label: 'Member Since', value: userProfile.memberSince, editable: false }
-  ];
+  const getMemberSince = (dateString) => {
+    if (!dateString) return "N/A";
+    const date = new Date(dateString);
+    const diffMs = Date.now() - date.getTime();
+    const diffMonths = Math.floor(diffMs / (1000 * 60 * 60 * 24 * 30));
+    const years = Math.floor(diffMonths / 12);
+    const months = diffMonths % 12;
+    const parts = [];
+    if (years > 0) parts.push(`${years} year${years > 1 ? "s" : ""}`);
+    if (months > 0) parts.push(`${months} month${months > 1 ? "s" : ""}`);
+    return parts.length ? parts.join(" ") : "Less than a month";
+  };
+
+  const normalizeProfile = (raw = {}) => ({
+    name: raw.name || "Unknown User",
+    email: raw.email || "Not available",
+    phone: raw.phone || "Not available",
+    accountCreated: raw.createdAt ? formatDate(raw.createdAt) : "N/A",
+    memberSince: raw.createdAt ? getMemberSince(raw.createdAt) : "N/A",
+    creditScore: raw.creditScore ?? 650,
+    accountStatus: raw.isActive ? "Active" : "Inactive",
+    verificationStatus: raw.isDemo
+      ? "Demo user"
+      : raw.isVerified
+        ? "Verified"
+        : "Unverified",
+    profileCompletion: raw.profileCompletionPercentage ?? 0,
+  });
+
+  useEffect(() => {
+    if (!user) {
+      navigate("/login");
+      return;
+    }
+
+    const initialData = normalizeProfile(user);
+    setUserProfile(initialData);
+
+    axiosInstance
+      .get("/users/profile")
+      .then((res) => {
+        if (res.data && res.data.success && res.data.user) {
+          setUserProfile(normalizeProfile(res.data.user));
+        }
+      })
+      .catch((err) => {
+        console.error("Failed to fetch profile", err);
+      })
+      .finally(() => setLoading(false));
+  }, [user, navigate]);
+
+  const personalInfo = userProfile
+    ? [
+        { label: "Email Address", value: userProfile.email, editable: false },
+        { label: "Phone Number", value: userProfile.phone, editable: true },
+        {
+          label: "Account Created",
+          value: userProfile.accountCreated,
+          editable: false,
+        },
+        {
+          label: "Member Since",
+          value: userProfile.memberSince,
+          editable: false,
+        },
+        {
+          label: "Profile Completion",
+          value: `${userProfile.profileCompletion}%`,
+          editable: false,
+        },
+        {
+          label: "Credit Score",
+          value: `${userProfile.creditScore}`,
+          editable: false,
+        },
+      ]
+    : [];
 
   const accountSettings = [
     {
-      icon: '🔒',
-      title: 'Privacy Settings',
-      description: 'Control who can see your information',
-      status: 'Standard',
-      action: 'Manage'
+      icon: "🔒",
+      title: "Privacy Settings",
+      description: "Control who can see your information",
+      status: "Standard",
+      action: "Manage",
     },
     {
-      icon: '🔐',
-      title: 'Security Preferences',
-      description: 'Manage two-factor authentication and security options',
-      status: 'Enabled',
-      action: 'Configure'
+      icon: "🔐",
+      title: "Security Preferences",
+      description: "Manage two-factor authentication and security options",
+      status: "Enabled",
+      action: "Configure",
     },
     {
-      icon: '📧',
-      title: 'Email Notifications',
-      description: 'Choose what email alerts you receive',
-      status: 'All Enabled',
-      action: 'Customize'
+      icon: "📧",
+      title: "Email Notifications",
+      description: "Choose what email alerts you receive",
+      status: "All Enabled",
+      action: "Customize",
     },
     {
-      icon: '🔔',
-      title: 'Push Notifications',
-      description: 'Control in-app and mobile notifications',
-      status: 'Enabled',
-      action: 'Adjust'
-    }
+      icon: "🔔",
+      title: "Push Notifications",
+      description: "Control in-app and mobile notifications",
+      status: "Enabled",
+      action: "Adjust",
+    },
   ];
+
+  if (loading || !userProfile) {
+    return (
+      <div className="profile-page">
+        <div className="profile-container" style={{ textAlign: "center" }}>
+          <h2 style={{ color: "#fff" }}>Loading your profile...</h2>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="profile-page">
       <div className="profile-container">
-        {/* Header Section */}
+        {/* Header Section
         <div className="profile-header">
           <h1>👤 Your Profile</h1>
-          <p className="subtitle">Manage your personal information and preferences</p>
+          <p className="subtitle">
+            Manage your personal information and preferences
+          </p>
           <div className="profile-actions">
-            <button className="profile-btn btn-primary" onClick={() => alert('✏️ Profile editing features coming soon!')}>
+            <button
+              className="profile-btn btn-primary"
+              onClick={() => alert("✏️ Profile editing features coming soon!")}
+            >
               ✏️ Edit Profile
             </button>
-            <button className="profile-btn btn-secondary" onClick={() => navigate('/credit-report')}>
+            <button
+              className="profile-btn btn-secondary"
+              onClick={() => navigate("/credit-report")}
+            >
               📋 View Report
             </button>
-            <button className="profile-btn btn-secondary" onClick={() => alert('📞 Support team will contact you shortly!')}>
+            <button
+              className="profile-btn btn-secondary"
+              onClick={() => alert("📞 Support team will contact you shortly!")}
+            >
               🆘 Contact Support
             </button>
           </div>
-        </div>
+        </div> */}
 
         {/* Profile Summary Card */}
         <div className="profile-summary-card">
           <div className="profile-avatar-section">
             <div className="profile-avatar">
-              <span>{userProfile.name.split(' ').map(n => n[0]).join('')}</span>
+              <span>
+                {userProfile.name
+                  .split(" ")
+                  .map((n) => n[0])
+                  .join("")}
+              </span>
             </div>
             <div className="profile-details">
               <h2>{userProfile.name}</h2>
-              <p className="verification-badge">✓ {userProfile.verificationStatus}</p>
+              <p className="verification-badge">
+                ✓ {userProfile.verificationStatus}
+              </p>
             </div>
           </div>
           <div className="profile-stats">
@@ -93,10 +195,12 @@ export default function Profile() {
               <span className="stat-label">Credit Score</span>
               <span className="stat-value">{userProfile.creditScore}</span>
             </div>
-            <div className="stat-box">
+            {/* <div className="stat-box">
               <span className="stat-label">Account Status</span>
-              <span className="stat-value active">{userProfile.accountStatus}</span>
-            </div>
+              <span className="stat-value active">
+                {userProfile.accountStatus}
+              </span>
+            </div> */}
             <div className="stat-box">
               <span className="stat-label">Member Since</span>
               <span className="stat-value">{userProfile.memberSince}</span>
@@ -111,9 +215,9 @@ export default function Profile() {
               <h3>📋 Personal Information</h3>
               <p>Your basic account information</p>
             </div>
-            <button 
+            <button
               className="info-btn"
-              onClick={() => setActiveModal('personal')}
+              onClick={() => setActiveModal("personal")}
               title="Why we need this information"
             >
               ℹ️
@@ -126,7 +230,9 @@ export default function Profile() {
                 <span className="info-label">{item.label}</span>
                 <div className="info-value-container">
                   <span className="info-value">{item.value}</span>
-                  {item.editable && <span className="editable-tag">Editable</span>}
+                  {item.editable && (
+                    <span className="editable-tag">Editable</span>
+                  )}
                 </div>
               </div>
             ))}
@@ -140,9 +246,9 @@ export default function Profile() {
               <h3>❤️ Account Health</h3>
               <p>Your account security and status</p>
             </div>
-            <button 
+            <button
               className="info-btn"
-              onClick={() => setActiveModal('health')}
+              onClick={() => setActiveModal("health")}
               title="What affects your account health"
             >
               ℹ️
@@ -180,9 +286,9 @@ export default function Profile() {
               <h3>⚙️ Settings & Preferences</h3>
               <p>Customize your account experience</p>
             </div>
-            <button 
+            <button
               className="info-btn"
-              onClick={() => setActiveModal('settings')}
+              onClick={() => setActiveModal("settings")}
               title="How to customize settings"
             >
               ℹ️
@@ -200,7 +306,9 @@ export default function Profile() {
                   </div>
                 </div>
                 <div className="setting-footer">
-                  <span className={`status-badge ${setting.status.toLowerCase().replace(/\s+/g, '-')}`}>
+                  <span
+                    className={`status-badge ${setting.status.toLowerCase().replace(/\s+/g, "-")}`}
+                  >
                     {setting.status}
                   </span>
                   <button className="btn-manage">{setting.action}</button>
@@ -217,9 +325,9 @@ export default function Profile() {
               <h3>📦 Subscription Plan</h3>
               <p>Manage your subscription and premium features</p>
             </div>
-            <button 
+            <button
               className="info-btn"
-              onClick={() => setActiveModal('subscription')}
+              onClick={() => setActiveModal("subscription")}
               title="Upgrade your plan"
             >
               ℹ️
@@ -247,17 +355,23 @@ export default function Profile() {
               <div className="billing-items">
                 <div className="billing-item">
                   <span className="billing-date">Feb 15, 2024</span>
-                  <span className="billing-desc">Premium Plus Subscription</span>
+                  <span className="billing-desc">
+                    Premium Plus Subscription
+                  </span>
                   <span className="billing-amount">$9.99</span>
                 </div>
                 <div className="billing-item">
                   <span className="billing-date">Jan 15, 2024</span>
-                  <span className="billing-desc">Premium Plus Subscription</span>
+                  <span className="billing-desc">
+                    Premium Plus Subscription
+                  </span>
                   <span className="billing-amount">$9.99</span>
                 </div>
                 <div className="billing-item">
                   <span className="billing-date">Dec 15, 2023</span>
-                  <span className="billing-desc">Premium Plus Subscription</span>
+                  <span className="billing-desc">
+                    Premium Plus Subscription
+                  </span>
                   <span className="billing-amount">$9.99</span>
                 </div>
               </div>
@@ -272,9 +386,9 @@ export default function Profile() {
               <h3>💬 Support & Resources</h3>
               <p>Get help when you need it</p>
             </div>
-            <button 
+            <button
               className="info-btn"
-              onClick={() => setActiveModal('support')}
+              onClick={() => setActiveModal("support")}
               title="How to get support"
             >
               ℹ️
@@ -344,7 +458,7 @@ export default function Profile() {
         </div>
 
         {/* InfoModals */}
-        {activeModal === 'personal' && (
+        {activeModal === "personal" && (
           <InfoModal
             title="Personal Information"
             icon="📋"
@@ -353,13 +467,13 @@ export default function Profile() {
               "Email Address: Used for account login and notifications",
               "Phone Number: For security verification and optional SMS alerts",
               "Account Creation Date: Shows when you joined our platform",
-              "Membership Duration: Reflects your loyalty and account age"
+              "Membership Duration: Reflects your loyalty and account age",
             ]}
             onClose={() => setActiveModal(null)}
           />
         )}
 
-        {activeModal === 'health' && (
+        {activeModal === "health" && (
           <InfoModal
             title="Account Health Status"
             icon="❤️"
@@ -369,13 +483,13 @@ export default function Profile() {
               "Security Level: Multi-factor authentication and security settings",
               "Profile Completion: Percentage of profile information filled in",
               "Activity Status: Your engagement with the platform",
-              "No suspicious activity: Your account is safe and secure"
+              "No suspicious activity: Your account is safe and secure",
             ]}
             onClose={() => setActiveModal(null)}
           />
         )}
 
-        {activeModal === 'settings' && (
+        {activeModal === "settings" && (
           <InfoModal
             title="Settings & Preferences"
             icon="⚙️"
@@ -385,13 +499,13 @@ export default function Profile() {
               "Security Preferences: 2FA, authentication methods, security questions",
               "Email Notifications: Choose which alerts you want to receive",
               "Push Notifications: In-app and mobile notification settings",
-              "Data Visibility: Control what appears on your dashboard"
+              "Data Visibility: Control what appears on your dashboard",
             ]}
             onClose={() => setActiveModal(null)}
           />
         )}
 
-        {activeModal === 'subscription' && (
+        {activeModal === "subscription" && (
           <InfoModal
             title="Subscription Plans"
             icon="📦"
@@ -401,13 +515,13 @@ export default function Profile() {
               "Real-time Alerts: Get notified immediately of credit changes",
               "Score Tracking: View 12+ months of credit score history",
               "AI Recommendations: Personalized improvement strategies",
-              "Flexible Billing: Cancel anytime, no long-term contracts"
+              "Flexible Billing: Cancel anytime, no long-term contracts",
             ]}
             onClose={() => setActiveModal(null)}
           />
         )}
 
-        {activeModal === 'support' && (
+        {activeModal === "support" && (
           <InfoModal
             title="Support & Resources"
             icon="💬"
@@ -417,7 +531,7 @@ export default function Profile() {
               "Knowledge Base: Comprehensive articles and guides",
               "Video Tutorials: Step-by-step guides for all features",
               "FAQ Section: Quick answers to common questions",
-              "Email Support: Detailed responses to complex issues"
+              "Email Support: Detailed responses to complex issues",
             ]}
             onClose={() => setActiveModal(null)}
           />
@@ -426,4 +540,3 @@ export default function Profile() {
     </div>
   );
 }
-
