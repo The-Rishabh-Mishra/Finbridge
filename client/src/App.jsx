@@ -16,6 +16,7 @@ import CibilCalculator from './pages/CibilCalculator'; // Updated to use page co
 import Navbar from './components/Navbar';
 import FraudCheckerOverlay from './components/FraudCheckerOverlay';
 import './styles/global.css';
+import BankLoansSection from './components/BankLoansSection.jsx';
 
 function ProtectedRoute({ children }) {
   const { isAuthenticated } = useContext(AuthContext);
