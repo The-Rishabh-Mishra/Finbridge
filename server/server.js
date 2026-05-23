@@ -1,8 +1,8 @@
+import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
-import dotenv from 'dotenv';
 import { fileURLToPath } from 'url';
 import path from 'path';
 
@@ -14,13 +14,13 @@ import historyRoutes from './routes/historyRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
 import chatbotRoutes from './routes/chatbotRoutes.js';
 import fraudRoutes from './routes/fraudRoutes.js';
+import paymentRoutes from './routes/paymentRoutes.js';
 
 // Import utilities
 import logger from './utils/logger.js';
 import connectDB from './config/db.js';
 
-// Load environment variables
-dotenv.config();
+// Environment variables are loaded by dotenv/config before the rest of the app imports.
 
 // Get directory name
 const __filename = fileURLToPath(import.meta.url);
@@ -30,6 +30,13 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 5000;
 const NODE_ENV = process.env.NODE_ENV || 'development';
+
+logger.debug('Server environment variables', {
+  PORT,
+  NODE_ENV,
+  RAZORPAY_KEY_ID: Boolean(process.env.RAZORPAY_KEY_ID),
+  RAZORPAY_KEY_SECRET: Boolean(process.env.RAZORPAY_KEY_SECRET),
+});
 
 // Middleware
 app.use(helmet());
@@ -46,6 +53,7 @@ app.use('/api/history', historyRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/chatbot', chatbotRoutes);
 app.use('/api/fraud', fraudRoutes);
+app.use('/api/payments', paymentRoutes);
 
 // Health check endpoint
 app.get('/health', (req, res) => {

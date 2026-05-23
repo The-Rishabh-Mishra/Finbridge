@@ -100,6 +100,122 @@ export default function Profile() {
       ]
     : [];
 
+  const [subscriptionLoading, setSubscriptionLoading] = useState(false);
+  const [subscriptionError, setSubscriptionError] = useState(null);
+
+  const planId = 'premium_plus';
+  const planDetails = {
+    id: 'premium_plus',
+    name: 'Premium Plus',
+    amount: 999,
+    displayPrice: '$9.99',
+    currency: 'INR',
+  };
+
+  const loadRazorpayScript = () => {
+    return new Promise((resolve, reject) => {
+      if (document.getElementById('razorpay-script')) {
+        return resolve(true);
+      }
+
+      const script = document.createElement('script');
+      script.id = 'razorpay-script';
+      script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+      script.onload = () => resolve(true);
+      script.onerror = () => reject(new Error('Failed to load Razorpay checkout script'));
+      document.body.appendChild(script);
+    });
+  };
+
+  const verifyPayment = async (paymentResult) => {
+    return axiosInstance.post('/payments/verify-payment', {
+      razorpay_order_id: paymentResult.razorpay_order_id,
+      razorpay_payment_id: paymentResult.razorpay_payment_id,
+      razorpay_signature: paymentResult.razorpay_signature,
+      planId,
+    });
+  };
+
+  const handleManageSubscription = async () => {
+    setSubscriptionError(null);
+    setSubscriptionLoading(true);
+
+    try {
+      await loadRazorpayScript();
+
+      const orderResponse = await axiosInstance.post('/payments/create-order', {
+        planId,
+      });
+
+      const orderData = orderResponse.data?.order;
+      const plan = orderResponse.data?.plan || planDetails;
+      const razorpayKeyFromServer = orderResponse.data?.keyId;
+
+      if (!orderData?.id) {
+        throw new Error('Unable to create order for payment');
+      }
+
+      // Prefer server-sent keyId (safe, public) to avoid relying on build-time env placeholders
+      const razorpayKey = razorpayKeyFromServer || import.meta.env.VITE_RAZORPAY_KEY_ID;
+      if (!razorpayKey) {
+        throw new Error('Razorpay key not available. Please set VITE_RAZORPAY_KEY_ID in client env or return key from server.');
+      }
+
+      const options = {
+        key: razorpayKey,
+        amount: orderData.amount,
+        currency: orderData.currency,
+        name: 'FinBridge Premium',
+        description: plan.name,
+        order_id: orderData.id,
+        handler: async function (paymentResult) {
+          try {
+            const verifyResponse = await verifyPayment(paymentResult);
+            if (verifyResponse.data?.success) {
+              alert('✅ Subscription updated successfully');
+            } else {
+              throw new Error(verifyResponse.data?.error || 'Payment verification failed');
+            }
+          } catch (verifyError) {
+            console.error('Payment verification failed', verifyError);
+            setSubscriptionError(
+              verifyError.response?.data?.error || verifyError.message || 'Payment verification failed'
+            );
+          } finally {
+            setSubscriptionLoading(false);
+          }
+        },
+        prefill: {
+          email: user?.email || userProfile?.email || '',
+          contact: userProfile?.phone || '',
+        },
+        notes: {
+          planId: plan.id,
+        },
+        theme: {
+          color: '#1a73e8',
+        },
+        modal: {
+          ondismiss: () => {
+            setSubscriptionLoading(false);
+          },
+        },
+      };
+
+      // If the Razorpay script failed to load (adblocker, network), window.Razorpay may be undefined
+      if (!window.Razorpay) {
+        throw new Error('Razorpay Checkout script not available. It may be blocked by an ad-blocker or failed to load.');
+      }
+
+      const razorpay = new window.Razorpay(options);
+      razorpay.open();
+    } catch (error) {
+      console.error('Subscription checkout error', error);
+      setSubscriptionError(error.response?.data?.error || error.message || 'Unable to start payment');
+      setSubscriptionLoading(false);
+    }
+  };
+
   const accountSettings = [
     {
       icon: "🔒",
@@ -347,7 +463,16 @@ export default function Profile() {
                 <div className="feature">✓ Score tracking history</div>
               </div>
               <p className="renewal-date">Next renewal: February 15, 2024</p>
-              <button className="btn-secondary">Manage Subscription</button>
+              <button
+                className="btn-secondary"
+                onClick={handleManageSubscription}
+                disabled={subscriptionLoading}
+              >
+                {subscriptionLoading ? 'Processing...' : 'Manage Subscription'}
+              </button>
+              {subscriptionError && (
+                <p className="error-text">{subscriptionError}</p>
+              )}
             </div>
 
             <div className="billing-history">

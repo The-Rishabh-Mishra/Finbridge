@@ -451,19 +451,17 @@ export default function FraudAwarenessHub() {
             <Link to="/#how-it-works" className="nav-link">
               How It Works
             </Link>
-            <Link to="/fraud-awareness" className="nav-link">
-              Fraud Awareness
+            <Link to="/" className="nav-link">
+              Fraud Checker
             </Link>
-
-            <div className="nav-buttons">
-              <button
-                className="nav-link fraud-btn"
-                onClick={() => navigate("/fraud-awareness")}
-              >
-                <span className="fraud-icon">⚡</span>
-                Fraud Checker
-              </button>
-            </div>
+            <button
+              className="nav-link fraud-btn"
+              onClick={() => navigate("/fraud-awareness")}
+            >
+              <span className="fraud-icon">🛡️</span>
+              Fraud Alert
+            </button>
+            
           </div>
 
           <div className="nav-buttons">

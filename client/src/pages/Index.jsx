@@ -107,18 +107,21 @@ export default function Index() {
             <a href="#how-it-works" className="nav-link">
               How It Works
             </a>
-            <Link to="/fraud-awareness" className="nav-link">
-              Fraud Awareness
-            </Link>
-            <Link to="/">
-              <button
-                className="nav-link fraud-btn"
-                onClick={() => setIsFraudOpen(true)}
-              >
-                <span className="fraud-icon">⚡</span>
-                Fraud Checker
-              </button>
-            </Link>
+
+             <button
+              className="nav-link"
+              onClick={() => setIsFraudOpen(true)}
+            >
+              Fraud Checker
+            </button>
+            <button
+              className="nav-link fraud-btn"
+              onClick={() => navigate("/fraud-awareness")}
+            >
+              <span className="fraud-icon">🛡️</span>
+              Fraud Alert
+            </button>
+           
           </div>
           <div className="nav-buttons">
             <button
