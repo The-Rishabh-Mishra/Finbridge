@@ -1,5 +1,6 @@
 import React, { createContext, useState, useCallback } from "react";
 import axios from "../utils/axiosInstance";
+import axiosInstance from "../utils/axiosInstance";
 
 export const AuthContext = createContext();
 
@@ -18,7 +19,7 @@ export function AuthProvider({ children }) {
   const login = useCallback(async (email, password) => {
     setLoading(true);
     try {
-      const response = await axios.post("/auth/login", { email, password });
+      const response = await axiosInstance.post("/auth/login", { email, password });
 
       if (response.data.success) {
         setToken(response.data.token);
